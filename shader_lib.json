@@ -1,0 +1,7 @@
+[
+  {
+    "name": "VoxShader",
+    "identifier": "vox_shader",
+    "source": ["./shader/vox.vs", "./shader/vox.fs", "./shader/vox.gs"]
+  }
+]
