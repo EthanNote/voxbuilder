@@ -1,5 +1,6 @@
+#version 400
 layout(location = 0) in vec4 vox;
-layout(location = ) in ivec2 props;
+layout(location = 1) in ivec2 props;
 
 out vec3 vox_pos;
 out float vox_size;

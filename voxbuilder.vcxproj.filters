@@ -39,9 +39,6 @@
     <ClInclude Include="CViewer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="CViewWindow.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="shaderlib.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -58,6 +55,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="controller.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="renderable.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderingContext.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Pipline.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -86,9 +92,6 @@
     <ClCompile Include="CViewer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="CViewWindow.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -108,6 +111,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="controller.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="renderable.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderingContext.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Pipline.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

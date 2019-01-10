@@ -1,3 +1,4 @@
+#include<GL/glew.h>
 #include<GLFW/glfw3.h>
 #include "controller.h"
 #include "camera.h"
@@ -55,7 +56,7 @@ void drag_get_vector(double *dx, double *dy) {
 void FrameEventHandler::FrameUpdate()
 {
 }
-
+#include<iostream>
 void CFpsCameraController::FrameUpdate()
 {
 	double dx, dy;
@@ -76,7 +77,6 @@ void CFpsCameraController::FrameUpdate()
 		-sin(ryall));
 
 	camera->position += forward * axis.GetY() + right * axis.GetX();
-
 }
 
 
@@ -103,17 +103,17 @@ InputAxis::InputAxis()
 
 	stroke_keys[DOWN].push_back(GLFW_KEY_S);
 	stroke_keys[DOWN].push_back(GLFW_KEY_DOWN);
-	
+
 	stroke_keys[LEFT].push_back(GLFW_KEY_A);
 	stroke_keys[LEFT].push_back(GLFW_KEY_LEFT);
-	
+
 	stroke_keys[RIGHT].push_back(GLFW_KEY_D);
 	stroke_keys[RIGHT].push_back(GLFW_KEY_RIGHT);
 }
 
 float InputAxis::GetX()
 {
-	auto v= stroke_strength[RIGHT] - stroke_strength[LEFT];
+	auto v = stroke_strength[RIGHT] - stroke_strength[LEFT];
 	if (v > 1) { v = 1; }
 	if (v < -1) { v = -1; }
 	return v;
@@ -151,7 +151,7 @@ void _key_callback(GLFWwindow*, int key, int scancode, int action, int mods) {
 KeyEventHandler::KeyEventHandler()
 {
 	handlers.push_back(this);
-	
+
 }
 
 KeyEventHandler::~KeyEventHandler()

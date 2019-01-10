@@ -4,9 +4,11 @@
 using namespace std;
 
 #include "CRenderableVertex.h"
-
-class CVoxBuffer
+#include "renderable.h"
+class CVoxBuffer :public Renderable
 {
+	void* GetVertexBufferPointer() override;
+	int GetPrimitiveCount();
 public:
 
 	vector<RenderableVertex> vertex_array;

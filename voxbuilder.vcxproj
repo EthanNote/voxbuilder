@@ -119,13 +119,15 @@
     <ClInclude Include="controller.h" />
     <ClInclude Include="CRenderableVertex.h" />
     <ClInclude Include="CViewer.h" />
-    <ClInclude Include="CViewWindow.h" />
     <ClInclude Include="CVoxBuffer.h" />
     <ClInclude Include="CVoxColor.h" />
     <ClInclude Include="CVoxElement.h" />
     <ClInclude Include="CVoxMaterial.h" />
     <ClInclude Include="CVoxModel.h" />
     <ClInclude Include="CVoxPalette.h" />
+    <ClInclude Include="Pipline.h" />
+    <ClInclude Include="renderable.h" />
+    <ClInclude Include="RenderingContext.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shaderlib.h" />
     <ClInclude Include="texture.h" />
@@ -136,7 +138,6 @@
     <ClCompile Include="controller.cpp" />
     <ClCompile Include="CRenderableVertex.cpp" />
     <ClCompile Include="CViewer.cpp" />
-    <ClCompile Include="CViewWindow.cpp" />
     <ClCompile Include="CVoxBuffer.cpp" />
     <ClCompile Include="CVoxColor.cpp" />
     <ClCompile Include="CVoxElement.cpp" />
@@ -144,6 +145,9 @@
     <ClCompile Include="CVoxModel.cpp" />
     <ClCompile Include="CVoxPalette.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Pipline.cpp" />
+    <ClCompile Include="renderable.cpp" />
+    <ClCompile Include="RenderingContext.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shaderlib.cpp" />
     <ClCompile Include="texture.cpp" />
