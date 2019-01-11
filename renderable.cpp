@@ -1,5 +1,9 @@
 #include "renderable.h"
 
+void Renderable::SetAttributes(std::vector<VERTEX_ATTRIBUTE>& attributes)
+{
+}
+
 void * Renderable::GetVertexBufferPointer()
 {
 	return nullptr;
@@ -11,11 +15,23 @@ int Renderable::GetPrimitiveCount()
 	return 0;
 }
 
+//
+//Renderable::Renderable()
+//{
+//	this->SetAttributes(this->attributes);
+//}
+
+void Renderable::SetAttributes()
+{
+	SetAttributes(attributes);
+}
 
 void Renderable::Draw()
 {
 	int primitiveCount = GetPrimitiveCount();
-	if (primitiveCount <= 0 || PrimitiveSize <= 0) {
+	auto primitiveType = GetPrimitiveType();
+	auto primitiveSize = GetPrimitiveSize();
+	if (primitiveCount <= 0 || primitiveSize <= 0) {
 		return;
 	}
 	void* vptr = GetVertexBufferPointer();
@@ -39,13 +55,13 @@ void Renderable::Draw()
 			}
 		}
 		if (isPointerSet) {
-			glDrawArrays(PrimitiveType, 0, primitiveCount);
+			glDrawArrays(primitiveType, 0, primitiveCount);
 
 		}
 		DisableAttributes();
 	}
 	else {
-		glDrawArrays(PrimitiveType, 0, primitiveCount);
+		glDrawArrays(primitiveType, 0, primitiveCount);
 	}
 }
 

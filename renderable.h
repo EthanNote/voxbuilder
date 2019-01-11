@@ -17,17 +17,26 @@ struct VERTEX_ATTRIBUTE {
 //}
 class Renderable
 {
-protected:
+	GLuint VAO = 0;
+	GLuint VBO = 0;
 	std::vector<VERTEX_ATTRIBUTE> attributes;
-	GLuint VAO=0;
-	GLuint VBO=0;
-	GLenum PrimitiveType = GL_POINTS;
-	GLuint PrimitiveSize = 0;
-	virtual void* GetVertexBufferPointer();
-	virtual int GetPrimitiveCount();
+protected:
+	virtual void* GetVertexBufferPointer() = 0;
+	virtual int GetPrimitiveCount() = 0;
+	virtual GLenum GetPrimitiveType() = 0;
+	virtual GLenum GetPrimitiveSize() = 0;
+	virtual void SetAttributes(std::vector<VERTEX_ATTRIBUTE>& attributes) = 0;
 public:
+	void SetAttributes();
 	void Draw();
 	void EnableAttributes();
 	void DisableAttributes();
 };
 
+template<class T>
+inline std::shared_ptr<T> CreateRenderable()
+{
+	auto ptr = new T;
+	((Renderable*)ptr)->SetAttributes();
+	return std::shared_ptr<T>(ptr);
+}

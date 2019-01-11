@@ -15,9 +15,18 @@ void CVoxShader::Load(){
     CShader::Load("./shader/vox.vs", "./shader/vox.fs", "./shader/vox.gs");
 }
 
+void CAxisShader::LocateUniforms(){
+    this->LocateUniform("MVP", this->MVP);
+}
+
+void CAxisShader::Load(){
+    CShader::Load("./shader/editor/axis.vs", "./shader/editor/axis.fs", NULL);
+}
+
 // global shader objects
 namespace shaderlib {
     VoxShader vox_shader = nullptr;
+    AxisShader axis_shader = nullptr;
 }
 
 void shaderlib::loadshaders(){
@@ -25,5 +34,10 @@ void shaderlib::loadshaders(){
     vox_shader = VoxShader(new CVoxShader);
     vox_shader -> Load();
     vox_shader -> LocateUniforms();
+
+
+    axis_shader = AxisShader(new CAxisShader);
+    axis_shader -> Load();
+    axis_shader -> LocateUniforms();
 
 }

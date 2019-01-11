@@ -15,9 +15,19 @@ public:
 
 typedef std::shared_ptr<CVoxShader> VoxShader;
 
+class CAxisShader : public CShader{
+public:
+    UniformMatrix MVP;
+    void Load();
+    void LocateUniforms();
+};
+
+typedef std::shared_ptr<CAxisShader> AxisShader;
+
 namespace shaderlib{
     // generated shader objects
     extern VoxShader vox_shader;
+    extern AxisShader axis_shader;
 
     void loadshaders();
 }

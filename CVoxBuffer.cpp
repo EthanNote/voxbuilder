@@ -3,9 +3,15 @@
 #include<iostream>
 #include<fstream>
 
+void CVoxBuffer::SetAttributes(std::vector<VERTEX_ATTRIBUTE>& attributes)
+{
+	attributes.push_back({ 0, 4, GL_FLOAT, GL_FALSE, sizeof(RenderableVertex), 0 });
+	attributes.push_back({ 1, 2, GL_FLOAT, GL_FALSE, sizeof(RenderableVertex), 4 * sizeof(float) });
+}
+
 void * CVoxBuffer::GetVertexBufferPointer()
 {
-	if(vertex_array.size()<=0)
+	if (vertex_array.size() <= 0)
 		return nullptr;
 	return &vertex_array[0];
 }
@@ -13,6 +19,16 @@ void * CVoxBuffer::GetVertexBufferPointer()
 int CVoxBuffer::GetPrimitiveCount()
 {
 	return vertex_array.size();
+}
+
+GLenum CVoxBuffer::GetPrimitiveType()
+{
+	return GL_POINTS;
+}
+
+GLenum CVoxBuffer::GetPrimitiveSize()
+{
+	return sizeof(RenderableVertex);
 }
 
 void CVoxBuffer::write(string fname)
@@ -38,15 +54,15 @@ void CVoxBuffer::read(string fname)
 	}
 }
 
-CVoxBuffer::CVoxBuffer()
-{
-	this->attributes.push_back({ 0, 4, GL_FLOAT, GL_FALSE, sizeof(RenderableVertex), 0 });
-	this->attributes.push_back({ 1, 2, GL_FLOAT, GL_FALSE, sizeof(RenderableVertex), 4*sizeof(float) });
-	this->PrimitiveSize = sizeof(RenderableVertex);
-	this->PrimitiveType = GL_POINTS;
-}
+//CVoxBuffer::CVoxBuffer()
+//{
+//	this->attributes.push_back({ 0, 4, GL_FLOAT, GL_FALSE, sizeof(RenderableVertex), 0 });
+//	this->attributes.push_back({ 1, 2, GL_FLOAT, GL_FALSE, sizeof(RenderableVertex), 4*sizeof(float) });
+//	/*this->PrimitiveSize = sizeof(RenderableVertex);
+//	this->PrimitiveType = GL_POINTS;*/
+//}
 
 
-CVoxBuffer::~CVoxBuffer()
-{
-}
+//CVoxBuffer::~CVoxBuffer()
+//{
+//}

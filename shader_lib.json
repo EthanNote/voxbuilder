@@ -3,5 +3,10 @@
     "name": "VoxShader",
     "identifier": "vox_shader",
     "source": ["./shader/vox.vs", "./shader/vox.fs", "./shader/vox.gs"]
+  },
+  {
+    "name": "AxisShader",
+    "identifier": "axis_shader",
+    "source": ["./shader/editor/axis.vs", "./shader/editor/axis.fs", null]
   }
 ]
