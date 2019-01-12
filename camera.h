@@ -29,7 +29,8 @@ protected:
 	glm::mat4 _last_get_projection = glm::mat4(1.0);
 	glm::mat4 _last_get_modelview = glm::mat4(1.0);
 	glm::mat4 _last_get_mvp = glm::mat4(1.0);
-
+	glm::mat4 _last_get_view = glm::mat4(1.0);
+	glm::mat4 _last_get_model = glm::mat4(1.0);
 	virtual void setupControls();
 	PerspectiveInfo m_perspectiveInfo;
 
@@ -41,6 +42,8 @@ public:
 
 	virtual glm::mat4 & GetProjection();
 	virtual glm::mat4 & GetModelView();
+	virtual glm::mat4 & GetView();
+	virtual glm::mat4 & GetModel();
 	virtual glm::mat4 & GetMVP();
 	std::shared_ptr<FrameEventHandler> controller=nullptr;
 	virtual std::shared_ptr<FrameEventHandler> CreateController();
@@ -64,6 +67,8 @@ public:
 	glm::vec3 up = glm::vec3(0, 1, 0);
 	float yall = 0;
 	float pitch = 0;
+	virtual glm::mat4 & GetView() override;
+	virtual glm::mat4 & GetModel() override;
 	virtual glm::mat4 & GetModelView() override;
 	virtual std::shared_ptr<FrameEventHandler> CreateController() override;
 };

@@ -8,5 +8,10 @@
     "name": "AxisShader",
     "identifier": "axis_shader",
     "source": ["./shader/editor/axis.vs", "./shader/editor/axis.fs", null]
+  },
+  {
+    "name": "SkyboxShader",
+    "identifier": "skybox_shader",
+    "source": ["./shader/editor/skybox/skybox.vs", "./shader/editor/skybox/skybox.fs", null]
   }
 ]

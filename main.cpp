@@ -59,29 +59,43 @@ public:
 };
 
 class EditorSkybox : public Renderable {
-
-};
-
-
-class EditorAxisGrids : public Renderable {
 	// Í¨¹ý Renderable ¼Ì³Ð
-	virtual void * GetVertexBufferPointer() override { return nullptr; }
-	virtual int GetPrimitiveCount() override { return 0; }
-	virtual GLenum GetPrimitiveType() override { return GLenum(); }
-	virtual GLenum GetPrimitiveSize() override { return GLenum(); }
+	float vertex[8]{
+		-1,1,		-1,-1,		1,1,		1,-1,
+	};
+	virtual void * GetVertexBufferPointer() override
+	{
+		return vertex;
+	}
+	virtual int GetPrimitiveCount() override
+	{
+		return 4;
+	}
+	virtual GLenum GetPrimitiveType() override
+	{
+		return GL_TRIANGLE_STRIP;
+	}
+	virtual GLenum GetPrimitiveSize() override
+	{
+		return 1;
+	}
 	virtual void SetAttributes(std::vector<VERTEX_ATTRIBUTE>& attributes) override
 	{
+		attributes.push_back({ 0,2,GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0 });
 	}
 };
 
+#define DefineRenderableObject(type, identifer) shared_ptr<type> identifer = CreateRenderable<type>()
 
 class AppPipline : public Pipline {
 public:
 	void Draw() override;
 	//VoxBuffer buffer = VoxBuffer(new CVoxBuffer);
 	VoxBuffer buffer = CreateRenderable<CVoxBuffer>();
-	shared_ptr<EditorAxisLines> axis = CreateRenderable<EditorAxisLines>();
-
+	DefineRenderableObject(EditorAxisLines, axis);
+	DefineRenderableObject(EditorSkybox, skybox);
+	//shared_ptr<EditorAxisLines> axis = CreateRenderable<EditorAxisLines>();
+	//shared_ptr<EditorSkybox> skybox = CreateRenderable<EditorSkybox>();
 
 	FpsCamera camera = camera::CreateFpsCamera();
 	std::shared_ptr<FrameEventHandler> camera_controller = nullptr;
@@ -111,6 +125,15 @@ void AppPipline::Draw()
 
 	auto MV = camera->GetModelView();
 	auto MVP = camera->GetMVP();
+	auto V = camera->GetView();
+	auto P = camera->GetProjection();
+	auto VP = P * V;
+	auto VP_inv = glm::inverse(VP);
+	shaderlib::skybox_shader->VP_inv.Set(VP_inv);
+	shaderlib::skybox_shader->UseProgram();
+	skybox->Draw();
+	glClear(GL_DEPTH_BUFFER_BIT);
+
 	shaderlib::vox_shader->MV.Set(MV);
 	shaderlib::vox_shader->MVP.Set(MVP);
 	shaderlib::vox_shader->UseProgram();
@@ -120,7 +143,7 @@ void AppPipline::Draw()
 	shaderlib::axis_shader->UseProgram();
 	axis->Draw();
 
-	cout<<glGetError()<<endl;
+	//cout << glGetError() << endl;
 }
 
 AppPipline::AppPipline()

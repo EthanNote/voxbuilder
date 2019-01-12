@@ -24,10 +24,20 @@ public:
 
 typedef std::shared_ptr<CAxisShader> AxisShader;
 
+class CSkyboxShader : public CShader{
+public:
+    UniformMatrix VP_inv;
+    void Load();
+    void LocateUniforms();
+};
+
+typedef std::shared_ptr<CSkyboxShader> SkyboxShader;
+
 namespace shaderlib{
     // generated shader objects
     extern VoxShader vox_shader;
     extern AxisShader axis_shader;
+    extern SkyboxShader skybox_shader;
 
     void loadshaders();
 }

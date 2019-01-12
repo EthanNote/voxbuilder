@@ -21,6 +21,18 @@ glm::mat4 & CCamera::GetModelView()
 	return this->_last_get_modelview;
 }
 
+glm::mat4 & CCamera::GetView()
+{
+	return this->_last_get_view;
+	// TODO: 在此处插入 return 语句
+}
+
+glm::mat4 & CCamera::GetModel()
+{
+	return this->_last_get_model;
+	// TODO: 在此处插入 return 语句
+}
+
 glm::mat4 & CCamera::GetMVP()
 {
 	this->_last_get_mvp = this->GetProjection() * this->GetModelView();
@@ -44,6 +56,26 @@ CCamera::CCamera()
 {
 }
 
+
+glm::mat4 & CFpsCamera::GetView()
+{
+	float ryall = glm::radians(this->yall);
+	float rpitch = glm::radians(this->pitch);
+	glm::vec3 looktarget(
+		-sin(ryall)*cos(rpitch),
+		sin(rpitch),
+		-cos(ryall)*cos(rpitch));
+	auto view = glm::lookAt(glm::vec3(0), looktarget, glm::vec3(0, 1, 0));
+	this->_last_get_view = view;
+
+	return _last_get_view;
+}
+
+glm::mat4 & CFpsCamera::GetModel()
+{
+	glm::translate(_last_get_model, -this->position);
+	return this->_last_get_model;
+}
 
 glm::mat4 & CFpsCamera::GetModelView()
 {
