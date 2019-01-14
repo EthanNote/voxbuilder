@@ -1,5 +1,5 @@
 #pragma once
-struct RenderableVertex
+struct VOX_VERTEX
 {
 public:
 	float x;

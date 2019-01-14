@@ -14,7 +14,7 @@ class CVoxBuffer :public Renderable
 	GLenum GetPrimitiveSize() override;
 public:
 
-	vector<RenderableVertex> vertex_array;
+	vector<VOX_VERTEX> vertex_array;
 	void write(string fname);
 
 	void read(string fname);

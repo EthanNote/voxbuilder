@@ -103,7 +103,45 @@ public:
 };
 
 
+class EditorCamera : public CCamera {
+	glm::vec3 focusPos;
+	float yall;
+	float pitch;
+};
 
+class EditorCursor {
+	glm::ivec3 selection_begin_pos;
+	glm::ivec3 range = glm::ivec3(32, 32, 32);
+	bool selectingState = false;
+public:
+	glm::ivec3 pos;
+	void Move(int direction);
+	void SetPos(int x, int y, int z);
+	void BeginSelect();
+	void EndSelect();
+	void GetSelection(glm::ivec3 & min, glm::ivec3 & max);
+};
+
+class CursorController {
+	EditorCamera* camera;
+	EditorCursor* cursor;
+};
+
+class Editor {
+public:
+	VoxBuffer buffer = CreateRenderable<CVoxBuffer>();
+	EditorCursor cursor;
+	void FillSelection();
+	void EraseSelection();
+	void Undo();
+	void Redo();
+	Editor();
+};
+
+
+Editor::Editor() {
+	buffer->vertex_array.resize(32768, { 0,0,0,-1,0,0 });
+}
 
 
 int main() {
@@ -149,4 +187,57 @@ void AppPipline::Draw()
 AppPipline::AppPipline()
 {
 	camera_controller = camera->CreateController();
+}
+
+#define MOVEDIR_X_DEC 1
+#define MOVEDIR_X_INC 2
+#define MOVEDIR_Y_DEC 4
+#define MOVEDIR_Y_INC 8
+#define MOVEDIR_Z_DEC 16
+#define MOVEDIR_Z_INC 32
+void EditorCursor::Move(int direction)
+{
+	if (direction & MOVEDIR_X_DEC) { SetPos(pos.x - 1, pos.y, pos.z); }
+	if (direction & MOVEDIR_X_INC) { SetPos(pos.x + 1, pos.y, pos.z); }
+	if (direction & MOVEDIR_Y_DEC) { SetPos(pos.x, pos.y - 1, pos.z); }
+	if (direction & MOVEDIR_Y_INC) { SetPos(pos.x, pos.y + 1, pos.z); }
+	if (direction & MOVEDIR_Z_DEC) { SetPos(pos.x, pos.y, pos.z - 1); }
+	if (direction & MOVEDIR_Z_INC) { SetPos(pos.x, pos.y, pos.z + 1); }
+}
+
+void EditorCursor::SetPos(int x, int y, int z)
+{
+	if (x < 0 || x >= range.x ||
+		y < 0 || y >= range.x ||
+		z < 0 || z >= range.x
+		) {
+		return;
+	}
+	pos = glm::ivec3(x, y, z);
+}
+
+void EditorCursor::BeginSelect()
+{
+	selection_begin_pos = pos;
+	selectingState = true;
+}
+
+void EditorCursor::EndSelect()
+{
+	selectingState = false;
+}
+
+#define MIN(x, y) (x>y?y:x)
+#define MAX(x, y) (x>y?x:y)
+
+void EditorCursor::GetSelection(glm::ivec3 & min, glm::ivec3 & max)
+{
+	if (selectingState) {
+		min = glm::ivec3(MIN(selection_begin_pos.x, pos.x), MIN(selection_begin_pos.y, pos.y), MIN(selection_begin_pos.z, pos.z));
+		max = glm::ivec3(MAX(selection_begin_pos.x, pos.x) + 1, MAX(selection_begin_pos.y, pos.y) + 1, MAX(selection_begin_pos.z, pos.z) + 1);
+	}
+	else {
+		min = pos;
+		max = pos + glm::ivec3(1);
+	}
 }

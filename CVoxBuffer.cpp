@@ -5,8 +5,8 @@
 
 void CVoxBuffer::SetAttributes(std::vector<VERTEX_ATTRIBUTE>& attributes)
 {
-	attributes.push_back({ 0, 4, GL_FLOAT, GL_FALSE, sizeof(RenderableVertex), 0 });
-	attributes.push_back({ 1, 2, GL_FLOAT, GL_FALSE, sizeof(RenderableVertex), 4 * sizeof(float) });
+	attributes.push_back({ 0, 4, GL_FLOAT, GL_FALSE, sizeof(VOX_VERTEX), 0 });
+	attributes.push_back({ 1, 2, GL_FLOAT, GL_FALSE, sizeof(VOX_VERTEX), 4 * sizeof(float) });
 }
 
 void * CVoxBuffer::GetVertexBufferPointer()
@@ -28,14 +28,14 @@ GLenum CVoxBuffer::GetPrimitiveType()
 
 GLenum CVoxBuffer::GetPrimitiveSize()
 {
-	return sizeof(RenderableVertex);
+	return sizeof(VOX_VERTEX);
 }
 
 void CVoxBuffer::write(string fname)
 {
 	ofstream output(fname.c_str(), ios::binary | ios::out);
 	if (output.is_open()) {
-		output.write((char*)&vertex_array[0], sizeof(RenderableVertex)*vertex_array.size());
+		output.write((char*)&vertex_array[0], sizeof(VOX_VERTEX)*vertex_array.size());
 	}
 
 }
@@ -47,8 +47,8 @@ void CVoxBuffer::read(string fname)
 	if (input.is_open()) {
 		while (!input.eof())
 		{
-			RenderableVertex v;
-			input.read((char*)&v, sizeof(RenderableVertex));
+			VOX_VERTEX v;
+			input.read((char*)&v, sizeof(VOX_VERTEX));
 			vertex_array.push_back(v);
 		}
 	}
