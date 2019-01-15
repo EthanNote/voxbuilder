@@ -13,5 +13,10 @@
     "name": "SkyboxShader",
     "identifier": "skybox_shader",
     "source": ["./shader/editor/skybox/skybox.vs", "./shader/editor/skybox/skybox.fs", null]
+  },
+  {
+    "name": "CursorShader",
+    "identifier": "cursor_shader",
+    "source": ["./shader/editor/cursor/cursor.vs", "./shader/editor/cursor/cursor.fs", "./shader/editor/cursor/cursor.gs"]
   }
 ]

@@ -113,3 +113,59 @@ FpsCamera camera::CreateFpsCamera()
 {
 	return FpsCamera(new CFpsCamera);
 }
+
+OrbitCamera camera::CreateOrbitCamera()
+{
+	return OrbitCamera(new COrbitCamera);
+}
+
+glm::mat4 & COrbitCamera::GetView()
+{
+	float ryall = glm::radians(this->yall);
+	float rpitch = glm::radians(this->pitch);
+	glm::vec3 eyepos(
+		-sin(ryall)*cos(rpitch)*radius+center.x,
+		sin(rpitch)*radius + center.y,
+		-cos(ryall)*cos(rpitch)*radius + center.z);
+	auto view = glm::lookAt(eyepos, center, glm::vec3(0, 1, 0));
+	this->_last_get_view = view;
+
+	return _last_get_view;
+	// TODO: 在此处插入 return 语句
+}
+
+glm::mat4 & COrbitCamera::GetModel()
+{
+	glm::translate(_last_get_model, -this->center);
+	return this->_last_get_model;
+	// TODO: 在此处插入 return 语句
+}
+
+glm::mat4 & COrbitCamera::GetModelView()
+{
+	/*float ryall = glm::radians(this->yall);
+	float rpitch = glm::radians(this->pitch);
+	glm::vec3 looktarget(
+		-sin(ryall)*cos(rpitch) + this->center.x,
+		sin(rpitch) + this->center.y,
+		-cos(ryall)*cos(rpitch) + this->center.z);
+	auto mv = glm::lookAt(this->center, looktarget, glm::vec3(0, 1, 0));
+	this->_last_get_modelview = mv;*/
+
+	GetModel();
+	GetView();
+
+	_last_get_modelview = _last_get_view * _last_get_model;
+
+	return _last_get_modelview;
+	// TODO: 在此处插入 return 语句
+}
+
+std::shared_ptr<FrameEventHandler> COrbitCamera::CreateController()
+{
+	auto controller = std::shared_ptr<COrbitCameraController>(new COrbitCameraController);
+	controller->camera = this;
+
+	return std::static_pointer_cast<FrameEventHandler>(controller);
+	//return std::shared_ptr<FrameEventHandler>();
+}

@@ -31,11 +31,20 @@ void CSkyboxShader::Load(){
     CShader::Load("./shader/editor/skybox/skybox.vs", "./shader/editor/skybox/skybox.fs", NULL);
 }
 
+void CCursorShader::LocateUniforms(){
+    this->LocateUniform("MVP", this->MVP);
+}
+
+void CCursorShader::Load(){
+    CShader::Load("./shader/editor/cursor/cursor.vs", "./shader/editor/cursor/cursor.fs", "./shader/editor/cursor/cursor.gs");
+}
+
 // global shader objects
 namespace shaderlib {
     VoxShader vox_shader = nullptr;
     AxisShader axis_shader = nullptr;
     SkyboxShader skybox_shader = nullptr;
+    CursorShader cursor_shader = nullptr;
 }
 
 void shaderlib::loadshaders(){
@@ -53,5 +62,10 @@ void shaderlib::loadshaders(){
     skybox_shader = SkyboxShader(new CSkyboxShader);
     skybox_shader -> Load();
     skybox_shader -> LocateUniforms();
+
+
+    cursor_shader = CursorShader(new CCursorShader);
+    cursor_shader -> Load();
+    cursor_shader -> LocateUniforms();
 
 }

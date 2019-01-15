@@ -33,11 +33,21 @@ public:
 
 typedef std::shared_ptr<CSkyboxShader> SkyboxShader;
 
+class CCursorShader : public CShader{
+public:
+    UniformMatrix MVP;
+    void Load();
+    void LocateUniforms();
+};
+
+typedef std::shared_ptr<CCursorShader> CursorShader;
+
 namespace shaderlib{
     // generated shader objects
     extern VoxShader vox_shader;
     extern AxisShader axis_shader;
     extern SkyboxShader skybox_shader;
+    extern CursorShader cursor_shader;
 
     void loadshaders();
 }

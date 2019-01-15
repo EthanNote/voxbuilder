@@ -39,6 +39,7 @@ void OpenGLRenderingContext::Run()
 }
 
 extern void drag_init(GLFWwindow* window);
+extern void _key_callback(GLFWwindow*, int key, int scancode, int action, int mods);
 
 OpenGLRenderingContext::OpenGLRenderingContext(int width, int height, const char* title )
 {
@@ -58,7 +59,7 @@ OpenGLRenderingContext::OpenGLRenderingContext(int width, int height, const char
 	glfwMakeContextCurrent(window);
 
 	drag_init(window);
-	//glfwSetKeyCallback(window, _key_callback);
+	glfwSetKeyCallback(window, _key_callback);
 	// start GLEW extension handler
 	glewExperimental = GL_TRUE;
 	GLenum err = glewInit();

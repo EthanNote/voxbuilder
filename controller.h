@@ -45,6 +45,15 @@ class CFpsCameraController : public FrameEventHandler {
 	virtual void FrameUpdate() override;
 };
 
+class COrbitCameraController : public FrameEventHandler, public KeyEventHandler {
+	friend class COrbitCamera;
+	COrbitCamera* camera;
+	InputAxis axis;
+	bool move_enable = false;
+	virtual void FrameUpdate() override;
 
+	// Í¨¹ý KeyEventHandler ¼Ì³Ð
+	virtual void OnKeyEvent(int key, int scancode, int action, int mods) override;
+};
 
 #endif // !_CONTROLLER_H_

@@ -110,7 +110,7 @@ InputAxis::InputAxis()
 	stroke_keys[RIGHT].push_back(GLFW_KEY_D);
 	stroke_keys[RIGHT].push_back(GLFW_KEY_RIGHT);
 }
-
+	
 float InputAxis::GetX()
 {
 	auto v = stroke_strength[RIGHT] - stroke_strength[LEFT];
@@ -157,4 +157,34 @@ KeyEventHandler::KeyEventHandler()
 KeyEventHandler::~KeyEventHandler()
 {
 	handlers.remove(this);
+}
+
+void COrbitCameraController::FrameUpdate()
+{
+	double dx, dy;
+	drag_get_vector(&dx, &dy);
+	camera->yall -= dx / camera->sensitivity;
+	camera->pitch -= dy / camera->sensitivity;
+
+	if (!move_enable) {
+		return;
+	}
+
+	float ryall = glm::radians(camera->yall);
+	float rpitch = glm::radians(camera->pitch);
+	glm::vec3 forward(
+		-sin(ryall)*cos(rpitch),
+		sin(rpitch),
+		-cos(ryall)*cos(rpitch));
+
+	glm::vec3 right(
+		cos(ryall),
+		0,
+		-sin(ryall));
+
+	camera->center += forward * axis.GetY() + right * axis.GetX();
+}
+
+void COrbitCameraController::OnKeyEvent(int key, int scancode, int action, int mods)
+{
 }

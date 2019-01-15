@@ -8,6 +8,13 @@
 using namespace std;
 
 
+#define MOVEDIR_X_DEC 1
+#define MOVEDIR_X_INC 2
+#define MOVEDIR_Y_DEC 4
+#define MOVEDIR_Y_INC 8
+#define MOVEDIR_Z_DEC 16
+#define MOVEDIR_Z_INC 32
+
 struct LINE {
 	float x;
 	float y;
@@ -85,21 +92,58 @@ class EditorSkybox : public Renderable {
 	}
 };
 
+class CursorGraphics : public Renderable {
+	// 通过 Renderable 继承
+public:
+	union {
+		int pos[3];
+		struct {
+			int x;
+			int y;
+			int z;
+		};
+	};
+private:
+	virtual void * GetVertexBufferPointer() override
+	{
+		return pos;
+	}
+	virtual int GetPrimitiveCount() override
+	{
+		return 1;
+	}
+	virtual GLenum GetPrimitiveType() override
+	{
+		return GL_POINTS();
+	}
+	virtual GLenum GetPrimitiveSize() override
+	{
+		return sizeof(int) * 3;
+	}
+	virtual void SetAttributes(std::vector<VERTEX_ATTRIBUTE>& attributes) override
+	{
+		attributes.push_back({ 0, 3, GL_FLOAT, GL_FALSE, 0, 0 });
+	}
+};
+
 #define DefineRenderableObject(type, identifer) shared_ptr<type> identifer = CreateRenderable<type>()
 
-class AppPipline : public Pipline {
+class EditorPipline : public Pipline {
 public:
 	void Draw() override;
 	//VoxBuffer buffer = VoxBuffer(new CVoxBuffer);
-	VoxBuffer buffer = CreateRenderable<CVoxBuffer>();
+	//VoxBuffer buffer = CreateRenderable<CVoxBuffer>();
+	VoxBuffer buffer = nullptr;
 	DefineRenderableObject(EditorAxisLines, axis);
 	DefineRenderableObject(EditorSkybox, skybox);
+	DefineRenderableObject(CursorGraphics, cursor);
 	//shared_ptr<EditorAxisLines> axis = CreateRenderable<EditorAxisLines>();
 	//shared_ptr<EditorSkybox> skybox = CreateRenderable<EditorSkybox>();
 
-	FpsCamera camera = camera::CreateFpsCamera();
+	//FpsCamera camera = camera::CreateFpsCamera();
+	OrbitCamera camera = camera::CreateOrbitCamera();
 	std::shared_ptr<FrameEventHandler> camera_controller = nullptr;
-	AppPipline();
+	EditorPipline();
 };
 
 
@@ -109,28 +153,71 @@ class EditorCamera : public CCamera {
 	float pitch;
 };
 
+class CursorController;
+
 class EditorCursor {
 	glm::ivec3 selection_begin_pos;
 	glm::ivec3 range = glm::ivec3(32, 32, 32);
 	bool selectingState = false;
+	CursorController* controller = NULL;
+
 public:
 	glm::ivec3 pos;
+	shared_ptr<CursorGraphics>graphics = nullptr;
 	void Move(int direction);
 	void SetPos(int x, int y, int z);
 	void BeginSelect();
 	void EndSelect();
 	void GetSelection(glm::ivec3 & min, glm::ivec3 & max);
+
+	void AttachController(CursorController* controller);
+	void DetachController();
+
 };
 
-class CursorController {
-	EditorCamera* camera;
-	EditorCursor* cursor;
+class CursorController : public KeyEventHandler {
+public:
+	EditorCamera* camera = NULL;
+	EditorCursor* cursor = NULL;
+
+	// 通过 KeyEventHandler 继承
+	virtual void OnKeyEvent(int key, int scancode, int action, int mods) override
+	{
+		cout << key << "  " << action << endl;
+		if (action == 1 && cursor != NULL) {
+			switch (key)
+			{
+			case GLFW_KEY_W:
+				cursor->Move(MOVEDIR_Z_DEC);
+				break;
+			case GLFW_KEY_S:
+				cursor->Move(MOVEDIR_Z_INC);
+				break;
+			case GLFW_KEY_A:
+				cursor->Move(MOVEDIR_X_DEC);
+				break;
+			case GLFW_KEY_D:
+				cursor->Move(MOVEDIR_X_INC);
+				break;
+			case GLFW_KEY_Q:
+				cursor->Move(MOVEDIR_Y_DEC);
+				break;
+			case GLFW_KEY_E:
+				cursor->Move(MOVEDIR_Y_INC);
+				break;
+			default:
+				break;
+			}
+		}
+		cout << cursor->pos.x << cursor->pos.y << cursor->pos.z << endl;
+	}
 };
 
 class Editor {
 public:
 	VoxBuffer buffer = CreateRenderable<CVoxBuffer>();
 	EditorCursor cursor;
+	EditorPipline* pipline;
 	void FillSelection();
 	void EraseSelection();
 	void Undo();
@@ -141,6 +228,21 @@ public:
 
 Editor::Editor() {
 	buffer->vertex_array.resize(32768, { 0,0,0,-1,0,0 });
+	int i = 0;
+	for (int z = 0; z < 32; z++) {
+		for (int y = 0; y < 32; y++) {
+			for (int x = 0; x < 32; x++) {
+				buffer->vertex_array[i].x = x;
+				buffer->vertex_array[i].y = y;
+				buffer->vertex_array[i].z = z;
+				i++;
+			}
+		}
+	}
+	pipline = new EditorPipline;
+	pipline->buffer = this->buffer;
+	cursor.graphics = pipline->cursor;
+	cursor.SetPos(0, 0, 0);
 }
 
 
@@ -148,16 +250,19 @@ int main() {
 	RenderingContextFactory rcFactory;
 	auto rc = rcFactory.CreateGLFWContext();
 	shaderlib::loadshaders();
-	auto pipline = new AppPipline;
-	pipline->buffer->vertex_array.push_back({ 0,0,0,1,0,0 });
-	pipline->camera->position = glm::vec3(-16, 24, -16);
+	auto editor = new Editor;
+	editor->cursor.AttachController(new CursorController);
+	auto pipline = editor->pipline;
+	//auto pipline = new EditorPipline;
+	//pipline->buffer->vertex_array.push_back({ 0,0,0,1,0,0 });
+	pipline->camera->center = glm::vec3(16, 0, 16);
 	pipline->camera->yall = -135;
-	pipline->camera->pitch = -30;
+	pipline->camera->pitch = 30;
 	rc->pipline = pipline;
 	rc->Run();
 }
 
-void AppPipline::Draw()
+void EditorPipline::Draw()
 {
 	this->camera_controller->FrameUpdate();
 
@@ -181,28 +286,31 @@ void AppPipline::Draw()
 	shaderlib::axis_shader->UseProgram();
 	axis->Draw();
 
+	shaderlib::cursor_shader->MVP.Set(MVP);
+	shaderlib::cursor_shader->UseProgram();
+	cursor->Draw();
+
 	//cout << glGetError() << endl;
 }
 
-AppPipline::AppPipline()
+EditorPipline::EditorPipline()
 {
 	camera_controller = camera->CreateController();
 }
 
-#define MOVEDIR_X_DEC 1
-#define MOVEDIR_X_INC 2
-#define MOVEDIR_Y_DEC 4
-#define MOVEDIR_Y_INC 8
-#define MOVEDIR_Z_DEC 16
-#define MOVEDIR_Z_INC 32
+
 void EditorCursor::Move(int direction)
 {
 	if (direction & MOVEDIR_X_DEC) { SetPos(pos.x - 1, pos.y, pos.z); }
 	if (direction & MOVEDIR_X_INC) { SetPos(pos.x + 1, pos.y, pos.z); }
 	if (direction & MOVEDIR_Y_DEC) { SetPos(pos.x, pos.y - 1, pos.z); }
 	if (direction & MOVEDIR_Y_INC) { SetPos(pos.x, pos.y + 1, pos.z); }
-	if (direction & MOVEDIR_Z_DEC) { SetPos(pos.x, pos.y, pos.z - 1); }
-	if (direction & MOVEDIR_Z_INC) { SetPos(pos.x, pos.y, pos.z + 1); }
+	if (direction & MOVEDIR_Z_DEC) { 
+		SetPos(pos.x, pos.y, pos.z - 1); 
+	}
+	if (direction & MOVEDIR_Z_INC) { 
+		SetPos(pos.x, pos.y, pos.z + 1); 
+	}
 }
 
 void EditorCursor::SetPos(int x, int y, int z)
@@ -214,6 +322,9 @@ void EditorCursor::SetPos(int x, int y, int z)
 		return;
 	}
 	pos = glm::ivec3(x, y, z);
+	graphics->x = x;
+	graphics->y = y;
+	graphics->z = z;
 }
 
 void EditorCursor::BeginSelect()
@@ -239,5 +350,19 @@ void EditorCursor::GetSelection(glm::ivec3 & min, glm::ivec3 & max)
 	else {
 		min = pos;
 		max = pos + glm::ivec3(1);
+	}
+}
+
+void EditorCursor::AttachController(CursorController * controller)
+{
+	this->controller = controller;
+	controller->cursor = this;
+}
+
+void EditorCursor::DetachController()
+{
+	if (controller) {
+		controller->cursor = NULL;
+		controller = NULL;
 	}
 }
