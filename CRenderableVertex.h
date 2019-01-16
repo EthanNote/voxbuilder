@@ -2,10 +2,10 @@
 struct VOX_VERTEX
 {
 public:
-	float x;
-	float y;
-	float z;
-	float size;
+	int x;
+	int y;
+	int z;
+	int size;
 	int palette_index;
 	int face_mask;
 };

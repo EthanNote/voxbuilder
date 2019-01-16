@@ -16,7 +16,7 @@ VoxBuffer CVoxModel::build_buffer()
 			for (int k = 0; k < size; k++) {
 				CVoxElement* element = NULL;
 				if ((element = get_element(i, j, k)) && !element->is_empty()) {
-					buffer->vertex_array.push_back({ (float)i,(float)j, (float)k,(float)1, element->palette_index, element->face_mask });
+					buffer->vertex_array.push_back({ i,j, k,1, element->palette_index, element->face_mask });
 				}
 
 			}

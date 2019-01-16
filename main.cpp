@@ -162,6 +162,7 @@ class EditorCursor {
 	CursorController* controller = NULL;
 
 public:
+	int step = 1;
 	glm::ivec3 pos;
 	shared_ptr<CursorGraphics>graphics = nullptr;
 	void Move(int direction);
@@ -184,7 +185,21 @@ public:
 	virtual void OnKeyEvent(int key, int scancode, int action, int mods) override
 	{
 		cout << key << "  " << action << endl;
-		if (action == 1 && cursor != NULL) {
+		if (cursor == NULL) {
+			return;
+		}
+
+		if (key == GLFW_KEY_LEFT_SHIFT) {
+			if (action) {
+				cursor->step = 4;
+			}
+			else {
+				cursor->step = 1;
+			}
+		}
+
+		if (action) {
+
 			switch (key)
 			{
 			case GLFW_KEY_W:
@@ -205,6 +220,7 @@ public:
 			case GLFW_KEY_E:
 				cursor->Move(MOVEDIR_Y_INC);
 				break;
+
 			default:
 				break;
 			}
@@ -213,7 +229,7 @@ public:
 	}
 };
 
-class Editor {
+class Editor :public KeyEventHandler {
 public:
 	VoxBuffer buffer = CreateRenderable<CVoxBuffer>();
 	EditorCursor cursor;
@@ -223,11 +239,65 @@ public:
 	void Undo();
 	void Redo();
 	Editor();
+
+	// Í¨¹ý KeyEventHandler ¼Ì³Ð
+	virtual void OnKeyEvent(int key, int scancode, int action, int mods) override
+	{
+		if (action) {
+			if (key == GLFW_KEY_ENTER) {
+				FillSelection();
+			}
+			if (key == GLFW_KEY_DELETE) {
+				EraseSelection();
+			}
+			if (key == GLFW_KEY_V) {
+				cursor.BeginSelect();
+			}
+			if (key == GLFW_KEY_ESCAPE) {
+				cursor.EndSelect();
+			}
+		}
+	}
 };
 
 
+void Editor::FillSelection()
+{
+	glm::ivec3 min;
+	glm::ivec3 max;
+	cursor.GetSelection(min, max);
+	const int sizeX = 32;
+	const int sizeY = 32;
+	for (int x = min.x; x < max.x; x++) {
+		for (int y = min.y; y < max.y; y++) {
+			for (int z = min.z; z < max.z; z++) {
+				buffer->vertex_array[z*sizeY*sizeX + y * sizeX + x].size = 1;
+				buffer->vertex_array[z*sizeY*sizeX + y * sizeX + x].palette_index = 1;
+				cout << "FILL " << x << " " << y << " " << z << endl;
+			}
+		}
+	}
+
+}
+
+void Editor::EraseSelection()
+{
+	glm::ivec3 min;
+	glm::ivec3 max;
+	cursor.GetSelection(min, max);
+	const int sizeX = 32;
+	const int sizeY = 32;
+	for (int x = min.x; x < max.x; x++) {
+		for (int y = min.y; y < max.y; y++) {
+			for (int z = min.z; z < max.z; z++) {
+				buffer->vertex_array[z*sizeY*sizeX + y * sizeX + x].size = 0;
+			}
+		}
+	}
+}
+
 Editor::Editor() {
-	buffer->vertex_array.resize(32768, { 0,0,0,-1,0,0 });
+	buffer->vertex_array.resize(32768, { 0,0,0,0,-1,0 });
 	int i = 0;
 	for (int z = 0; z < 32; z++) {
 		for (int y = 0; y < 32; y++) {
@@ -301,16 +371,12 @@ EditorPipline::EditorPipline()
 
 void EditorCursor::Move(int direction)
 {
-	if (direction & MOVEDIR_X_DEC) { SetPos(pos.x - 1, pos.y, pos.z); }
-	if (direction & MOVEDIR_X_INC) { SetPos(pos.x + 1, pos.y, pos.z); }
-	if (direction & MOVEDIR_Y_DEC) { SetPos(pos.x, pos.y - 1, pos.z); }
-	if (direction & MOVEDIR_Y_INC) { SetPos(pos.x, pos.y + 1, pos.z); }
-	if (direction & MOVEDIR_Z_DEC) { 
-		SetPos(pos.x, pos.y, pos.z - 1); 
-	}
-	if (direction & MOVEDIR_Z_INC) { 
-		SetPos(pos.x, pos.y, pos.z + 1); 
-	}
+	if (direction & MOVEDIR_X_DEC) { SetPos(pos.x - step, pos.y, pos.z); }
+	if (direction & MOVEDIR_X_INC) { SetPos(pos.x + step, pos.y, pos.z); }
+	if (direction & MOVEDIR_Y_DEC) { SetPos(pos.x, pos.y - step, pos.z); }
+	if (direction & MOVEDIR_Y_INC) { SetPos(pos.x, pos.y + step, pos.z); }
+	if (direction & MOVEDIR_Z_DEC) { SetPos(pos.x, pos.y, pos.z - step); }
+	if (direction & MOVEDIR_Z_INC) { SetPos(pos.x, pos.y, pos.z + step); }
 }
 
 void EditorCursor::SetPos(int x, int y, int z)

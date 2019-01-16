@@ -3,8 +3,8 @@ layout(points) in;
 layout(triangle_strip, max_vertices = 24) out;
 
 
-in vec3 vox_pos[];
-in float vox_size[];
+in ivec3 vox_pos[];
+in int vox_size[];
 in int vox_palette_index[];
 in int vox_face_mask[];
 
@@ -37,7 +37,7 @@ void face_vertex(int a, int b, int c, int d){
 void main(){
     vec4 pos = vec4(vox_pos[0],1.0);
 
-    if(vox_palette_index[0]<0 || vox_size[0]<0){
+    if(vox_palette_index[0]<0 || vox_size[0]<=0){
         EndPrimitive();
         return;
     }
