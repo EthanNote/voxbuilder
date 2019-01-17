@@ -4,6 +4,7 @@
 #include "camera.h"
 #include"CVoxBuffer.h"
 #include "controller.h"
+#include "rendertarget.h"
 #include<iostream>
 using namespace std;
 
@@ -128,8 +129,30 @@ private:
 
 #define DefineRenderableObject(type, identifer) shared_ptr<type> identifer = CreateRenderable<type>()
 
+class Quad : public Renderable {
+	float vertices[16]{
+		-1,  1, 0, 1,
+		-1, -1, 0, 0,
+		 1,  1, 1, 1,
+		 1, -1, 1, 0
+	};
+	// Í¨¹ý Renderable ¼Ì³Ð
+	virtual void * GetVertexBufferPointer() override { return vertices; }
+	virtual int GetPrimitiveCount() override { return 4; }
+	virtual GLenum GetPrimitiveType() override { return GL_TRIANGLE_STRIP; }
+	virtual GLenum GetPrimitiveSize() override { return sizeof(float) * 4; }
+	virtual void SetAttributes(std::vector<VERTEX_ATTRIBUTE>& attributes) override
+	{
+		attributes.push_back({ 0,2,GL_FLOAT, GL_FALSE, sizeof(float) * 4,0 });
+		attributes.push_back({ 1,2,GL_FLOAT, GL_FALSE, sizeof(float) * 4,sizeof(float) * 2 });
+	}
+
+};
+
 class EditorPipline : public Pipline {
 public:
+	RenderTarget geometry;
+	RenderTarget screen = CRenderTarget::Screen();
 	void Draw() override;
 	//VoxBuffer buffer = VoxBuffer(new CVoxBuffer);
 	//VoxBuffer buffer = CreateRenderable<CVoxBuffer>();
@@ -137,6 +160,7 @@ public:
 	DefineRenderableObject(EditorAxisLines, axis);
 	DefineRenderableObject(EditorSkybox, skybox);
 	DefineRenderableObject(CursorGraphics, cursor);
+	DefineRenderableObject(Quad, quad);
 	//shared_ptr<EditorAxisLines> axis = CreateRenderable<EditorAxisLines>();
 	//shared_ptr<EditorSkybox> skybox = CreateRenderable<EditorSkybox>();
 
@@ -342,30 +366,43 @@ void EditorPipline::Draw()
 	auto P = camera->GetProjection();
 	auto VP = P * V;
 	auto VP_inv = glm::inverse(VP);
-	shaderlib::skybox_shader->VP_inv.Set(VP_inv);
-	shaderlib::skybox_shader->UseProgram();
-	skybox->Draw();
-	glClear(GL_DEPTH_BUFFER_BIT);
 
-	shaderlib::vox_shader->MV.Set(MV);
-	shaderlib::vox_shader->MVP.Set(MVP);
-	shaderlib::vox_shader->UseProgram();
-	buffer->Draw();
+	geometry->Pass([&] {
 
-	shaderlib::axis_shader->MVP.Set(MVP);
-	shaderlib::axis_shader->UseProgram();
-	axis->Draw();
+		shaderlib::skybox_shader->VP_inv.Set(VP_inv);
+		shaderlib::skybox_shader->UseProgram();
+		skybox->Draw();
+		glClear(GL_DEPTH_BUFFER_BIT);
 
-	shaderlib::cursor_shader->MVP.Set(MVP);
-	shaderlib::cursor_shader->UseProgram();
-	cursor->Draw();
+		shaderlib::vox_shader->MV.Set(MV);
+		shaderlib::vox_shader->MVP.Set(MVP);
+		shaderlib::vox_shader->UseProgram();
+		buffer->Draw();
 
+		shaderlib::axis_shader->MVP.Set(MVP);
+		shaderlib::axis_shader->UseProgram();
+		axis->Draw();
+
+		shaderlib::cursor_shader->MVP.Set(MVP);
+		shaderlib::cursor_shader->UseProgram();
+		cursor->Draw();
+	});
+
+	
+	screen->Pass([&] {
+		shaderlib::quad_shader->color_texture.Set(geometry->color_buffers[0]);
+		shaderlib::quad_shader->UseProgram();
+		quad->Draw();
+	});
 	//cout << glGetError() << endl;
 }
 
 EditorPipline::EditorPipline()
 {
 	camera_controller = camera->CreateController();
+	geometry = CRenderTarget::Create();
+	geometry->CreateColorBuffers(800, 600, 3);
+	geometry->CreateDepthBuffer(800, 600);
 }
 
 

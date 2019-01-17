@@ -128,6 +128,7 @@
     <ClInclude Include="Pipline.h" />
     <ClInclude Include="renderable.h" />
     <ClInclude Include="RenderingContext.h" />
+    <ClInclude Include="rendertarget.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="shaderlib.h" />
     <ClInclude Include="texture.h" />
@@ -148,6 +149,7 @@
     <ClCompile Include="Pipline.cpp" />
     <ClCompile Include="renderable.cpp" />
     <ClCompile Include="RenderingContext.cpp" />
+    <ClCompile Include="rendertarget.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shaderlib.cpp" />
     <ClCompile Include="texture.cpp" />

@@ -42,12 +42,22 @@ public:
 
 typedef std::shared_ptr<CCursorShader> CursorShader;
 
+class CQuadShader : public CShader{
+public:
+    UniformSampler2D color_texture;
+    void Load();
+    void LocateUniforms();
+};
+
+typedef std::shared_ptr<CQuadShader> QuadShader;
+
 namespace shaderlib{
     // generated shader objects
     extern VoxShader vox_shader;
     extern AxisShader axis_shader;
     extern SkyboxShader skybox_shader;
     extern CursorShader cursor_shader;
+    extern QuadShader quad_shader;
 
     void loadshaders();
 }
