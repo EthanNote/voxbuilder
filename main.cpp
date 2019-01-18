@@ -5,6 +5,7 @@
 #include"CVoxBuffer.h"
 #include "controller.h"
 #include "rendertarget.h"
+#include<chrono>
 #include<iostream>
 using namespace std;
 
@@ -281,6 +282,14 @@ public:
 				cursor.EndSelect();
 			}
 		}
+		if (key == GLFW_KEY_TAB) {
+			if (action) {
+				shaderlib::quad_shader->option.Set(1);
+			}
+			else {
+				shaderlib::quad_shader->option.Set(0);
+			}
+		}
 	}
 };
 
@@ -376,6 +385,13 @@ void EditorPipline::Draw()
 
 		shaderlib::vox_shader->MV.Set(MV);
 		shaderlib::vox_shader->MVP.Set(MVP);
+		auto hightlight = glm::vec3(1, 0, 0);
+		shaderlib::vox_shader->highlight_color.Set(hightlight);
+		auto now = std::chrono::system_clock::now();
+		auto milliseconds = std::chrono::duration_cast<chrono::milliseconds>(now.time_since_epoch()).count();
+		auto time = milliseconds%10000000 / 100.0;
+		shaderlib::vox_shader->time.Set(time);
+		shaderlib::vox_shader->selection_id.Set(cursor->z * 1024 + cursor->y * 32 + cursor->x + 1);
 		shaderlib::vox_shader->UseProgram();
 		buffer->Draw();
 
@@ -388,9 +404,10 @@ void EditorPipline::Draw()
 		cursor->Draw();
 	});
 
-	
+
 	screen->Pass([&] {
 		shaderlib::quad_shader->color_texture.Set(geometry->color_buffers[0]);
+		shaderlib::quad_shader->index_texture.Set(geometry->color_buffers[3]);
 		shaderlib::quad_shader->UseProgram();
 		quad->Draw();
 	});
@@ -401,7 +418,7 @@ EditorPipline::EditorPipline()
 {
 	camera_controller = camera->CreateController();
 	geometry = CRenderTarget::Create();
-	geometry->CreateColorBuffers(800, 600, 3);
+	geometry->CreateColorBuffers(800, 600, 4);
 	geometry->CreateDepthBuffer(800, 600);
 }
 

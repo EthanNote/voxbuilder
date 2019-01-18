@@ -40,6 +40,12 @@ public:
 	void Set(int value);
 };
 
+class UniformFloat : public Uniform {
+	//virtual void Set(void* value) override;
+public:
+	void Set(float value);
+};
+
 class UniformSampler2D : public UniformInt {
 public:
 	void Set(TextureUnit unit);

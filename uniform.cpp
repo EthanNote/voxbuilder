@@ -110,3 +110,10 @@ void UniformVec3::Set(glm::vec3 & vec)
 	glUniform3fv(this->location, 1, &vec[0]);
 	glUseProgram(0);
 }
+
+void UniformFloat::Set(float value)
+{
+	glUseProgram(this->program);
+	glUniform1f(this->location, (GLfloat)value);
+	glUseProgram(0);
+}
