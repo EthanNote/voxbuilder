@@ -13,5 +13,5 @@ void main(){
     vox_size = vox.w;
     vox_palette_index = props.x;
     vox_face_mask = props.y;
-    vox_index = vox.z*1024 + vox.y*32 +vox.x +1;
+    vox_index = vox.z*1024 + vox.y*32 +vox.x +100000;
 }

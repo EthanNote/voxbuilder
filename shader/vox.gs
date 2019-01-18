@@ -39,6 +39,8 @@ void face_vertex(int a, int b, int c, int d){
 void main(){
     vec4 pos = vec4(vox_pos[0],1.0);
     if(vox_palette_index[0]<0 || vox_size[0]<=0){
+        vox_id=0;
+        vox_face_id=0;
         EndPrimitive();
         return;
     }

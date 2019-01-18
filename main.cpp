@@ -168,6 +168,9 @@ public:
 	//FpsCamera camera = camera::CreateFpsCamera();
 	OrbitCamera camera = camera::CreateOrbitCamera();
 	std::shared_ptr<FrameEventHandler> camera_controller = nullptr;
+	/*glm::vec2 pick;
+	int pick_vox_id;
+	int pick_vox_face;*/
 	EditorPipline();
 };
 
@@ -209,7 +212,7 @@ public:
 	// 通过 KeyEventHandler 继承
 	virtual void OnKeyEvent(int key, int scancode, int action, int mods) override
 	{
-		cout << key << "  " << action << endl;
+		//cout << key << "  " << action << endl;
 		if (cursor == NULL) {
 			return;
 		}
@@ -250,11 +253,11 @@ public:
 				break;
 			}
 		}
-		cout << cursor->pos.x << cursor->pos.y << cursor->pos.z << endl;
+		//cout << cursor->pos.x << cursor->pos.y << cursor->pos.z << endl;
 	}
 };
 
-class Editor :public KeyEventHandler {
+class Editor :public KeyEventHandler, public MousePositionEventHandler {
 public:
 	VoxBuffer buffer = CreateRenderable<CVoxBuffer>();
 	EditorCursor cursor;
@@ -291,6 +294,31 @@ public:
 			}
 		}
 	}
+
+	// 通过 MousePositionEventHandler 继承
+	virtual void OnMousePosition(double x, double y) override
+	{
+		//cout << x << "," << y << "  ->  ";
+		/*pipline->pick.x = x;
+		pipline->pick.y = y;*/
+
+		glm::vec4 pixel;
+		pipline->geometry->ReadPixel(3, x, 600 - y, pixel);
+		//cout << pixel.x << "  " << pixel.y << endl;
+		int vox_id = pixel.x - 100000;
+		int vox_face = pixel.y;
+		if (vox_id > 0) {
+			/*pick_vox_id = vox_id;
+			pick_vox_face = vox_face;*/
+			cursor.SetPos(vox_id % 32, (vox_id / 32) % 32, (vox_id / 1024) % 32);
+		}
+		else {
+			/*pick_vox_id = -1;
+			pick_vox_face = -1;*/
+		}
+
+		
+	}
 };
 
 
@@ -306,7 +334,7 @@ void Editor::FillSelection()
 			for (int z = min.z; z < max.z; z++) {
 				buffer->vertex_array[z*sizeY*sizeX + y * sizeX + x].size = 1;
 				buffer->vertex_array[z*sizeY*sizeX + y * sizeX + x].palette_index = 1;
-				cout << "FILL " << x << " " << y << " " << z << endl;
+				//cout << "FILL " << x << " " << y << " " << z << endl;
 			}
 		}
 	}
@@ -389,7 +417,7 @@ void EditorPipline::Draw()
 		shaderlib::vox_shader->highlight_color.Set(hightlight);
 		auto now = std::chrono::system_clock::now();
 		auto milliseconds = std::chrono::duration_cast<chrono::milliseconds>(now.time_since_epoch()).count();
-		auto time = milliseconds%10000000 / 100.0;
+		auto time = milliseconds % 10000000 / 100.0;
 		shaderlib::vox_shader->time.Set(time);
 		shaderlib::vox_shader->selection_id.Set(cursor->z * 1024 + cursor->y * 32 + cursor->x + 1);
 		shaderlib::vox_shader->UseProgram();
@@ -412,6 +440,19 @@ void EditorPipline::Draw()
 		quad->Draw();
 	});
 	//cout << glGetError() << endl;
+	//glm::vec4 pixel;
+	//geometry->ReadPixel(3, pick.x, 600 - pick.y, pixel);
+	////cout << pixel.x << "  " << pixel.y << endl;
+	//int vox_id = pixel.x - 100000;
+	//int vox_face = pixel.y;
+	//if (vox_id > 0) {
+	//	pick_vox_id = vox_id;
+	//	pick_vox_face = vox_face;
+	//}
+	//else {
+	//	pick_vox_id = -1;
+	//	pick_vox_face = -1;
+	//}
 }
 
 EditorPipline::EditorPipline()

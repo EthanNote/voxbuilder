@@ -42,6 +42,24 @@ void CRenderTarget::CreateDepthBuffer(int width, int height)
 
 	this->depth_buffer = T;
 }
+#include<iostream>
+using namespace std;
+void CRenderTarget::ReadPixel(int index, int x, int y, glm::vec4 & out)
+{
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, this->fbo);
+	glReadBuffer(GL_COLOR_ATTACHMENT0 + index);
+	auto err = glGetError();
+	if (err) {
+		cout << err << endl;
+	}
+	//PixelInfo Pixel;
+	glReadPixels(x, y, 1, 1, GL_RGB, GL_FLOAT, &out);
+
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+
+	//return Pixel;
+}
 
 RTCheckResult CRenderTarget::CheckStatus()
 {

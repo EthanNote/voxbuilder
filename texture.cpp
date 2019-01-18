@@ -65,6 +65,10 @@ GLuint CTexture::GetBinding()
 	return this->binding;
 }
 
+void CTexture::ReadPixel(double x, double y, glm::vec4 & out)
+{
+}
+
 inline void set_t2d_params() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

@@ -27,6 +27,7 @@ public:
 
 	void CreateColorBuffers(int width, int height, int count);
 	void CreateDepthBuffer(int width, int height);
+	void ReadPixel(int index, int x, int y, glm::vec4 & out);
 
 	RTCheckResult CheckStatus();
 	RTCheckResult CheckStatus(std::function<void(RTCheckResult)> callback);
