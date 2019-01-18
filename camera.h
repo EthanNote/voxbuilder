@@ -75,6 +75,7 @@ public:
 
 class COrbitCamera : public CCamera {
 public:
+	bool enable_rotate = false;
 	glm::vec3 center = glm::vec3(0, 0, 0);
 	float radius = 50;
 	glm::vec3 up = glm::vec3(0, 1, 0);

@@ -171,6 +171,9 @@ KeyEventHandler::~KeyEventHandler()
 
 void COrbitCameraController::FrameUpdate()
 {
+	if (!this->camera->enable_rotate) {
+		return;
+	}
 	double dx, dy;
 	drag_get_vector(&dx, &dy);
 	camera->yall -= dx / camera->sensitivity;
@@ -197,6 +200,9 @@ void COrbitCameraController::FrameUpdate()
 
 void COrbitCameraController::OnKeyEvent(int key, int scancode, int action, int mods)
 {
+	if (key == GLFW_KEY_LEFT_ALT) {
+		this->camera->enable_rotate = action;
+	}
 }
 
 MousePositionEventHandler::MousePositionEventHandler()

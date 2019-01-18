@@ -305,11 +305,12 @@ public:
 		glm::vec4 pixel;
 		pipline->geometry->ReadPixel(3, x, 600 - y, pixel);
 		//cout << pixel.x << "  " << pixel.y << endl;
-		int vox_id = pixel.x - 100000;
+		int vox_id = int(pixel.x) - 100000;
 		int vox_face = pixel.y;
-		if (vox_id > 0) {
+		if (vox_id >= 0) {
 			/*pick_vox_id = vox_id;
 			pick_vox_face = vox_face;*/
+			cout << pixel.x<<"  "<< vox_id << endl;
 			cursor.SetPos(vox_id % 32, (vox_id / 32) % 32, (vox_id / 1024) % 32);
 		}
 		else {
@@ -419,7 +420,7 @@ void EditorPipline::Draw()
 		auto milliseconds = std::chrono::duration_cast<chrono::milliseconds>(now.time_since_epoch()).count();
 		auto time = milliseconds % 10000000 / 100.0;
 		shaderlib::vox_shader->time.Set(time);
-		shaderlib::vox_shader->selection_id.Set(cursor->z * 1024 + cursor->y * 32 + cursor->x + 1);
+		shaderlib::vox_shader->selection_id.Set(cursor->z * 1024 + cursor->y * 32 + cursor->x );
 		shaderlib::vox_shader->UseProgram();
 		buffer->Draw();
 
