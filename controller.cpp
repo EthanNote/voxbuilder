@@ -128,19 +128,29 @@ float InputAxis::GetY()
 }
 
 #include<list>
-std::list<KeyEventHandler*> handlers;
+std::list<KeyEventHandler*> keyevent_handlers;
+std::list<MousePositionEventHandler*> mousepos_handlers;
 
-
-void _handler_call(int key, int scancode, int action, int mods) {
-	for (auto i = handlers.begin(); i != handlers.end(); i++) {
+void _keyevent_handler_call(int key, int scancode, int action, int mods) {
+	for (auto i = keyevent_handlers.begin(); i != keyevent_handlers.end(); i++) {
 		(*i)->OnKeyEvent(key, scancode, action, mods);
 	}
 }
 
-void _key_callback(GLFWwindow*, int key, int scancode, int action, int mods) {
-	_handler_call(key, scancode, action, mods);
+void _mousepos_handler_call(double x, double y)
+{
+	for (auto i = mousepos_handlers.begin(); i != mousepos_handlers.end(); i++) {
+		(*i)->OnMousePosition(x, y);
+	}
 }
 
+void _key_callback(GLFWwindow*, int key, int scancode, int action, int mods) {
+	_keyevent_handler_call(key, scancode, action, mods);
+}
+
+void _cursorpos_callback(GLFWwindow*, double x, double y) {
+	_mousepos_handler_call(x, y);
+}
 //void KeyEventHandler::Enable()
 //{
 //	/*GLFWkeyfun(keyfunc);
@@ -150,13 +160,13 @@ void _key_callback(GLFWwindow*, int key, int scancode, int action, int mods) {
 
 KeyEventHandler::KeyEventHandler()
 {
-	handlers.push_back(this);
+	keyevent_handlers.push_back(this);
 
 }
 
 KeyEventHandler::~KeyEventHandler()
 {
-	handlers.remove(this);
+	keyevent_handlers.remove(this);
 }
 
 void COrbitCameraController::FrameUpdate()
@@ -187,4 +197,14 @@ void COrbitCameraController::FrameUpdate()
 
 void COrbitCameraController::OnKeyEvent(int key, int scancode, int action, int mods)
 {
+}
+
+MousePositionEventHandler::MousePositionEventHandler()
+{
+	mousepos_handlers.push_back(this);
+}
+
+MousePositionEventHandler::~MousePositionEventHandler()
+{
+	mousepos_handlers.remove(this);
 }

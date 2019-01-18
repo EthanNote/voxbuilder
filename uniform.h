@@ -21,6 +21,11 @@ public:
 	void Set(glm::mat4 & mat);
 };
 
+class UniformVec3 : public Uniform {
+	//virtual void Set(void* value) override;
+public:
+	void Set(glm::vec3 & vec);
+};
 
 class UniformVec4 : public Uniform {
 	//virtual void Set(void* value) override;
@@ -33,6 +38,12 @@ class UniformInt : public Uniform {
 	//virtual void Set(void* value) override;
 public:
 	void Set(int value);
+};
+
+class UniformFloat : public Uniform {
+	//virtual void Set(void* value) override;
+public:
+	void Set(float value);
 };
 
 class UniformSampler2D : public UniformInt {

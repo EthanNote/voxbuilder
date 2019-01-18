@@ -103,3 +103,17 @@ void UniformVec4Array::Set(int vectorCount, float * buffer)
 	glUniform4fv(this->location, vectorCount, buffer);
 	glUseProgram(0);
 }
+
+void UniformVec3::Set(glm::vec3 & vec)
+{
+	glUseProgram(this->program);
+	glUniform3fv(this->location, 1, &vec[0]);
+	glUseProgram(0);
+}
+
+void UniformFloat::Set(float value)
+{
+	glUseProgram(this->program);
+	glUniform1f(this->location, (GLfloat)value);
+	glUseProgram(0);
+}

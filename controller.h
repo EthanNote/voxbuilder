@@ -7,7 +7,7 @@
 class CCamera;
 
 class KeyEventHandler {
-	friend void _handler_call(int key, int scancode, int action, int mods);
+	friend void _keyevent_handler_call(int key, int scancode, int action, int mods);
 protected:
 	virtual void OnKeyEvent(int key, int scancode, int action, int mods) = 0;
 public:
@@ -25,6 +25,18 @@ public:
 	InputAxis();
 	float GetX();
 	float GetY();
+};
+
+
+//void (* GLFWcursorposfun)(GLFWwindow*,double,double);
+
+class MousePositionEventHandler {
+	friend void _mousepos_handler_call(double x, double y);
+protected:
+	virtual void OnMousePosition(double x, double y)=0;
+public:
+	MousePositionEventHandler();
+	~MousePositionEventHandler();
 };
 
 class FrameEventHandler {

@@ -7,11 +7,13 @@ in ivec3 vox_pos[];
 in int vox_size[];
 in int vox_palette_index[];
 in int vox_face_mask[];
-
+in int vox_index[];
 // flat out vec4 color;
 out vec4 view_pos;
 flat out vec3 world_normal;
 flat out int color_palette_index;
+flat out int vox_id;
+flat out int vox_face_id;
 
 uniform mat4 MVP;
 uniform mat4 MV;
@@ -36,11 +38,13 @@ void face_vertex(int a, int b, int c, int d){
 
 void main(){
     vec4 pos = vec4(vox_pos[0],1.0);
-
     if(vox_palette_index[0]<0 || vox_size[0]<=0){
+        vox_id=0;
+        vox_face_id=0;
         EndPrimitive();
         return;
     }
+    vox_id = vox_index[0];
 
     v[0] = pos;
     v[1] = pos + vec4(vox_size[0], 0.0,         0.0,         0.0);
@@ -54,30 +58,36 @@ void main(){
     // z-
     // color = vec4(0.5,0.5,0.0,1.0);
     world_normal = vec3(0.0, 0.0, -1.0);
+    vox_face_id = 5;
     face_vertex(0,1,2,3);
 
     // z+
     // color = vec4(0.0, 0.0, 1.0, 1.0);
     world_normal = vec3(0.0, 0.0, 1.0);
+    vox_face_id = 6;
     face_vertex(4,5,6,7);
 
     // x-
     // color = vec4(0.0, 0.5, 0.5, 1.0);
     world_normal = vec3(-1.0, 0.0, 0.0);
+    vox_face_id = 1;
     face_vertex(0,4,2,6);
 
     // x+
     // color = vec4(1.0, 0.0, 0.0, 1.0);
     world_normal = vec3(1.0, 0.0, 0.0);
+    vox_face_id = 2;
     face_vertex(1,5,3,7);
 
     // y-
     // color = vec4(0.5, 0.0, 0.5, 1.0);
     world_normal = vec3(0.0, -1.0, 0.0);
+    vox_face_id = 3;
     face_vertex(0,1,4,5);
 
     // y+
     // color = vec4(0.0, 1.0, 0.0, 1.0);
     world_normal = vec3(0.0, 1.0, 0.0);
+    vox_face_id = 4;
     face_vertex(2,3,6,7);
 }

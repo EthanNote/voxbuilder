@@ -18,5 +18,10 @@
     "name": "CursorShader",
     "identifier": "cursor_shader",
     "source": ["./shader/editor/cursor/cursor.vs", "./shader/editor/cursor/cursor.fs", "./shader/editor/cursor/cursor.gs"]
+  },
+  {
+    "name": "QuadShader",
+    "identifier": "quad_shader",
+    "source": ["./shader/editor/quad/quad.vs", "./shader/editor/quad/quad.fs", null]
   }
 ]

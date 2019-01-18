@@ -1,6 +1,7 @@
 #pragma once
 #include<GL/glew.h>
 #include<GLFW/glfw3.h>
+#include<glm/glm.hpp>
 #include<memory>
 #include<string>
 #include<map>
@@ -60,6 +61,7 @@ enum TextureUnit {
 class CTexture;
 typedef std::shared_ptr<CTexture> Texture;
 
+
 class CTexture
 {
 	GLuint name=-1;	
@@ -70,6 +72,7 @@ public:
 	void Bind(GLuint unit);
 	GLuint Bind();
 	GLuint GetBinding();
+	void ReadPixel(double x, double y, glm::vec4 & out);
 	CTexture();
 	~CTexture();
 	static Texture Create(int width, int height);
