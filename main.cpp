@@ -150,6 +150,12 @@ class Quad : public Renderable {
 
 };
 
+struct VoxPickInfo {
+	glm::vec2 pick_pos;
+	int picked_vox_id;
+	int picked_vox_face;
+};
+
 class EditorPipline : public Pipline {
 public:
 	RenderTarget geometry;
@@ -171,6 +177,9 @@ public:
 	/*glm::vec2 pick;
 	int pick_vox_id;
 	int pick_vox_face;*/
+	VoxPickInfo pickinfo;
+	ColorOutputIndex index_0 = ColorOutputIndex(new CColorOutputIndex({ 0 }));
+	ColorOutputIndex index_0123 = ColorOutputIndex(new CColorOutputIndex({ 0, 1, 2 ,3 }));
 	EditorPipline();
 };
 
@@ -298,27 +307,20 @@ public:
 	// Í¨¹ý MousePositionEventHandler ¼Ì³Ð
 	virtual void OnMousePosition(double x, double y) override
 	{
-		//cout << x << "," << y << "  ->  ";
-		/*pipline->pick.x = x;
-		pipline->pick.y = y;*/
+		pipline->pickinfo.pick_pos.x = x;
+		pipline->pickinfo.pick_pos.y = y;
+		//glm::vec4 pixel;
+		//pipline->geometry->ReadPixel(3, x, 600 - y, pixel);
+		//int vox_id = int(pixel.x) - 100000;
+		//int vox_face = pixel.y;
+		//if (vox_id >= 0) {
+		//	cursor.SetPos(vox_id % 32, (vox_id / 32) % 32, (vox_id / 1024) % 32);
+		//}
+		//else {
+		//	//cout << pixel.x << "  " << pixel.y << endl;
+		//}
 
-		glm::vec4 pixel;
-		pipline->geometry->ReadPixel(3, x, 600 - y, pixel);
-		//cout << pixel.x << "  " << pixel.y << endl;
-		int vox_id = int(pixel.x) - 100000;
-		int vox_face = pixel.y;
-		if (vox_id >= 0) {
-			/*pick_vox_id = vox_id;
-			pick_vox_face = vox_face;*/
-			cout << pixel.x<<"  "<< vox_id << endl;
-			cursor.SetPos(vox_id % 32, (vox_id / 32) % 32, (vox_id / 1024) % 32);
-		}
-		else {
-			/*pick_vox_id = -1;
-			pick_vox_face = -1;*/
-		}
 
-		
 	}
 };
 
@@ -335,7 +337,6 @@ void Editor::FillSelection()
 			for (int z = min.z; z < max.z; z++) {
 				buffer->vertex_array[z*sizeY*sizeX + y * sizeX + x].size = 1;
 				buffer->vertex_array[z*sizeY*sizeX + y * sizeX + x].palette_index = 1;
-				//cout << "FILL " << x << " " << y << " " << z << endl;
 			}
 		}
 	}
@@ -385,8 +386,6 @@ int main() {
 	auto editor = new Editor;
 	editor->cursor.AttachController(new CursorController);
 	auto pipline = editor->pipline;
-	//auto pipline = new EditorPipline;
-	//pipline->buffer->vertex_array.push_back({ 0,0,0,1,0,0 });
 	pipline->camera->center = glm::vec3(16, 0, 16);
 	pipline->camera->yall = -135;
 	pipline->camera->pitch = 30;
@@ -407,11 +406,15 @@ void EditorPipline::Draw()
 
 	geometry->Pass([&] {
 
+		geometry->SetColorOutput(index_0123);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		geometry->SetColorOutput(index_0);
 		shaderlib::skybox_shader->VP_inv.Set(VP_inv);
 		shaderlib::skybox_shader->UseProgram();
 		skybox->Draw();
 		glClear(GL_DEPTH_BUFFER_BIT);
 
+		geometry->SetColorOutput(index_0123);
 		shaderlib::vox_shader->MV.Set(MV);
 		shaderlib::vox_shader->MVP.Set(MVP);
 		auto hightlight = glm::vec3(1, 0, 0);
@@ -420,13 +423,15 @@ void EditorPipline::Draw()
 		auto milliseconds = std::chrono::duration_cast<chrono::milliseconds>(now.time_since_epoch()).count();
 		auto time = milliseconds % 10000000 / 100.0;
 		shaderlib::vox_shader->time.Set(time);
-		shaderlib::vox_shader->selection_id.Set(cursor->z * 1024 + cursor->y * 32 + cursor->x );
+		shaderlib::vox_shader->selection_id.Set(cursor->z * 1024 + cursor->y * 32 + cursor->x);
 		shaderlib::vox_shader->UseProgram();
 		buffer->Draw();
 
+		geometry->SetColorOutput(index_0);
 		shaderlib::axis_shader->MVP.Set(MVP);
 		shaderlib::axis_shader->UseProgram();
 		axis->Draw();
+
 
 		shaderlib::cursor_shader->MVP.Set(MVP);
 		shaderlib::cursor_shader->UseProgram();
@@ -440,20 +445,20 @@ void EditorPipline::Draw()
 		shaderlib::quad_shader->UseProgram();
 		quad->Draw();
 	});
-	//cout << glGetError() << endl;
-	//glm::vec4 pixel;
-	//geometry->ReadPixel(3, pick.x, 600 - pick.y, pixel);
-	////cout << pixel.x << "  " << pixel.y << endl;
-	//int vox_id = pixel.x - 100000;
-	//int vox_face = pixel.y;
-	//if (vox_id > 0) {
-	//	pick_vox_id = vox_id;
-	//	pick_vox_face = vox_face;
-	//}
-	//else {
-	//	pick_vox_id = -1;
-	//	pick_vox_face = -1;
-	//}
+
+
+	glm::vec4 pixel;
+	geometry->ReadPixel(3, pickinfo.pick_pos.x, 600 - pickinfo.pick_pos.y, pixel);
+	pickinfo.picked_vox_id = int(pixel.x) - 100000;
+	pickinfo.picked_vox_face = int(pixel.y);
+	//cursor->
+	if (pickinfo.picked_vox_id >= 0) {
+		cursor->x = pickinfo.picked_vox_id % 32;
+		cursor->y = (pickinfo.picked_vox_id / 32) % 32;
+		cursor->z = (pickinfo.picked_vox_id / 1024) % 32;
+	}
+
+	//cursor.SetPos(vox_id % 32, (vox_id / 32) % 32, (vox_id / 1024) % 32);
 }
 
 EditorPipline::EditorPipline()

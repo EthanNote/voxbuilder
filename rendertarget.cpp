@@ -61,6 +61,37 @@ void CRenderTarget::ReadPixel(int index, int x, int y, glm::vec4 & out)
 	//return Pixel;
 }
 
+void CRenderTarget::SetColorOutput(std::vector<int> index)
+{
+	int n = index.size();
+	if (n <= 0) {
+		glDrawBuffers(0, NULL);
+		return;
+	}
+	if (n == 1) {
+		GLenum attachment = GL_COLOR_ATTACHMENT0 + index[0];
+		glDrawBuffers(1, &attachment);
+	}
+	GLenum* attachments = new GLenum[n];
+	memcpy(attachments, &index[0], sizeof(GLenum)*n);
+	for (int i = 0; i < n; i++) {
+		attachments[i] += GL_COLOR_ATTACHMENT0;
+	}
+	glDrawBuffers(n, attachments);
+
+	delete attachments;
+}
+
+void CRenderTarget::SetColorOutput(ColorOutputIndex index)
+{
+	int n = index->attachments.size();
+	if (n <= 0) {
+		glDrawBuffers(0, NULL);
+		return;
+	}
+	glDrawBuffers(n, &index->attachments[0]);
+}
+
 RTCheckResult CRenderTarget::CheckStatus()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
@@ -89,6 +120,7 @@ RTCheckResult CRenderTarget::CheckStatus(std::function<void(RTCheckResult)> call
 void CRenderTarget::Pass(std::function<void()> drawing)
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
+	//glDrawBuffers(this->color_buffers.size(), DrawBuffers);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	drawing();
@@ -127,4 +159,12 @@ RenderTarget CRenderTarget::Screen()
 {
 	static RenderTarget rt = RenderTarget(create_default());
 	return rt;
+}
+
+CColorOutputIndex::CColorOutputIndex(std::vector<int> index)
+{
+	attachments.assign(index.begin(), index.end());
+	for (auto i = attachments.begin(); i != attachments.end(); i++) {
+		(*i) += GL_COLOR_ATTACHMENT0;
+	}
 }

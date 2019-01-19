@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{576F9920-2C88-44F8-9E1A-EEC86EAD2560}</ProjectGuid>
+    <ProjectGuid>{AC1FC994-A873-42D9-8CF0-8015FBC3EC1F}</ProjectGuid>
     <RootNamespace>voxbuilder</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>

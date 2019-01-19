@@ -16,6 +16,15 @@ enum RTCheckResult {
 	INCOMPLETE_READ_BUFFER = GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER
 };
 
+class CColorOutputIndex {
+	friend class CRenderTarget;
+	std::vector<GLenum> attachments;
+public:
+	CColorOutputIndex(std::vector<int> index);
+};
+typedef std::shared_ptr<CColorOutputIndex> ColorOutputIndex;
+
+
 
 class CRenderTarget
 {
@@ -28,7 +37,8 @@ public:
 	void CreateColorBuffers(int width, int height, int count);
 	void CreateDepthBuffer(int width, int height);
 	void ReadPixel(int index, int x, int y, glm::vec4 & out);
-
+	void SetColorOutput(std::vector<int> index);
+	void SetColorOutput(ColorOutputIndex index);
 	RTCheckResult CheckStatus();
 	RTCheckResult CheckStatus(std::function<void(RTCheckResult)> callback);
 	
